@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "4335581496",
+    "firebase_url": "https://racify---prod-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "racify---prod",
+    "storage_bucket": "racify---prod.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4335581496:android:5e214f905661c798f369cd",
+        "android_client_info": {
+          "package_name": "com.f1widget"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTU6Tn_yo9qJbxUJj-_q0h4HOV-i2FeNY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

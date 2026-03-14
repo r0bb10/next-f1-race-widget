@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Official F1 Colors -->
+    <color name="f1_black">#15151E</color>
+    <color name="f1_gray">#38383F</color>
+    <color name="f1_light_gray">#949498</color>
+    <color name="f1_red">#E10600</color>
+    <color name="f1_white">#FFFFFF</color>
+
+    <!-- Widget Colors -->
+    <color name="widget_background">@color/f1_black</color>
+    <color name="widget_header_background">@color/f1_gray</color>
+    <color name="widget_text_primary">@color/f1_white</color>
+    <color name="widget_text_secondary">@color/f1_light_gray</color>
+    <color name="widget_race_highlight">@color/f1_red</color>
+    <color name="widget_separator">@color/f1_red</color>
+</resources>

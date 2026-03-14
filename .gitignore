@@ -1,0 +1,45 @@
+*.iml
+.gradle
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# APK/Bundle outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# Build outputs
+bin/
+gen/
+out/
+release/
+.navigation/
+captures/
+output.json
+app/build/
+build/
+*/build/
+
+# Backup files
+*.bak
+
+# Documentation (keep local only)
+*.md
+*.MD
+
+# Shell scripts (keep local only)
+*.sh
+
+# Reverse engineering artifacts (parent directory)
+../extracted/
+../decompiled/
+../*.xapk
+../*.apk
