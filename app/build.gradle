@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.f1widget'
+    namespace = 'com.f1widget'
     compileSdk 36
 
     defaultConfig {
@@ -33,7 +33,7 @@ android {
     }
 
     buildFeatures {
-        compose true
+        compose = true
     }
 
     composeOptions {
