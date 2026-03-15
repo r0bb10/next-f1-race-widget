@@ -2,6 +2,7 @@ package com.f1widget.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -16,8 +17,7 @@ import androidx.glance.layout.*
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
-import com.f1widget.R
+import androidx.glance.color.ColorProvider
 import com.f1widget.data.F1Repository
 import java.text.SimpleDateFormat
 import java.util.*
@@ -50,7 +50,7 @@ class NextRoundF1Widget : GlanceAppWidget() {
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(ColorProvider(R.color.widget_background))
+                .background(ColorProvider(day = Color(0xFF15151E), night = Color(0xFF15151E)))
                 .padding(16.dp),
             contentAlignment = Alignment.TopStart
         ) {
@@ -73,7 +73,7 @@ class NextRoundF1Widget : GlanceAppWidget() {
             } else {
                 Text(
                     text = "Loading F1 schedule...",
-                    style = TextStyle(fontSize = 14.sp, color = ColorProvider(R.color.widget_text_secondary))
+                    style = TextStyle(fontSize = 14.sp, color = ColorProvider(day = Color(0xFF949498), night = Color(0xFF949498)))
                 )
             }
         }
@@ -84,35 +84,34 @@ class NextRoundF1Widget : GlanceAppWidget() {
         val (dayRange, month) = extractDateRange(race.session1, race.session5)
         Box(
             modifier = GlanceModifier
-                .background(ColorProvider(R.color.f1_white))
+                .background(ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFFFFFFFF)))
                 .cornerRadius(8.dp)
                 .padding(horizontal = 10.dp, vertical = 8.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = dayRange, style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.f1_black)))
-                Text(text = month, style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.f1_black)))
+                Text(text = dayRange, style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, color = ColorProvider(day = Color(0xFF15151E), night = Color(0xFF15151E))))
+                Text(text = month, style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ColorProvider(day = Color(0xFF15151E), night = Color(0xFF15151E))))
             }
         }
     }
 
     @Composable
-    private fun RowScope.InfoBox(race: com.f1widget.data.CalendarItem) {
+    private fun InfoBox(race: com.f1widget.data.CalendarItem) {
         Box(
             modifier = GlanceModifier
-                .weight(1f)
-                .background(ColorProvider(R.color.widget_header_background))
+                .background(ColorProvider(day = Color(0xFF38383F), night = Color(0xFF38383F)))
                 .cornerRadius(8.dp)
                 .padding(horizontal = 12.dp, vertical = 10.dp)
         ) {
             Column {
                 Text(
                     text = "${extractRoundNumber(race.id)}•${extractLocation(race)} ${getCountryFlag(race.country)}",
-                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary))
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFFFFFFFF)))
                 )
                 Spacer(modifier = GlanceModifier.height(4.dp))
                 Text(
                     text = race.roundTitle.uppercase(),
-                    style = TextStyle(fontSize = 11.sp, color = ColorProvider(R.color.widget_text_secondary)),
+                    style = TextStyle(fontSize = 11.sp, color = ColorProvider(day = Color(0xFF949498), night = Color(0xFF949498))),
                     maxLines = 2
                 )
             }
@@ -124,13 +123,13 @@ class NextRoundF1Widget : GlanceAppWidget() {
         val nextSessionTime = findNextSession(race)
         val countdown = getCountdown(nextSessionTime)
         Column(horizontalAlignment = Alignment.End) {
-            Text(text = "NEXT SESSION", style = TextStyle(fontSize = 9.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_secondary)))
+            Text(text = "NEXT SESSION", style = TextStyle(fontSize = 9.sp, fontWeight = FontWeight.Bold, color = ColorProvider(day = Color(0xFF949498), night = Color(0xFF949498))))
             Spacer(modifier = GlanceModifier.height(4.dp))
             Row(horizontalAlignment = Alignment.End, verticalAlignment = Alignment.CenterVertically) {
                 CountdownUnit(countdown.days.toString().padStart(2, '0'), "DAYS")
-                Text(text = " | ", style = TextStyle(color = ColorProvider(R.color.widget_text_secondary)))
+                Text(text = " | ", style = TextStyle(color = ColorProvider(day = Color(0xFF949498), night = Color(0xFF949498))))
                 CountdownUnit(countdown.hours.toString().padStart(2, '0'), "HRS")
-                Text(text = " | ", style = TextStyle(color = ColorProvider(R.color.widget_text_secondary)))
+                Text(text = " | ", style = TextStyle(color = ColorProvider(day = Color(0xFF949498), night = Color(0xFF949498))))
                 CountdownUnit(countdown.minutes.toString().padStart(2, '0'), "MIN")
             }
         }
@@ -139,8 +138,8 @@ class NextRoundF1Widget : GlanceAppWidget() {
     @Composable
     private fun CountdownUnit(value: String, label: String) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = value, style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary)))
-            Text(text = label, style = TextStyle(fontSize = 9.sp, color = ColorProvider(R.color.widget_text_secondary)))
+            Text(text = value, style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, color = ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFFFFFFFF))))
+            Text(text = label, style = TextStyle(fontSize = 9.sp, color = ColorProvider(day = Color(0xFF949498), night = Color(0xFF949498))))
         }
     }
 
@@ -151,7 +150,7 @@ class NextRoundF1Widget : GlanceAppWidget() {
             if (race.session2.isNotEmpty()) SessionRow(if (race.weekendType == "sprint") "SPRINT QUALIFYING" else "PRACTICE 2", race.session2)
             if (race.session3.isNotEmpty()) SessionRow(if (race.weekendType == "sprint") "SPRINT" else "PRACTICE 3", race.session3)
             Spacer(modifier = GlanceModifier.height(4.dp))
-            Box(modifier = GlanceModifier.fillMaxWidth().height(1.dp).background(ColorProvider(R.color.widget_separator))) {}
+            Box(modifier = GlanceModifier.fillMaxWidth().height(1.dp).background(ColorProvider(day = Color(0xFFE10600), night = Color(0xFFE10600)))) {}
             Spacer(modifier = GlanceModifier.height(4.dp))
             SessionRow("QUALIFYING", race.session4)
             SessionRow("GRAND PRIX", race.session5, isRace = true)
@@ -162,10 +161,11 @@ class NextRoundF1Widget : GlanceAppWidget() {
     private fun SessionRow(label: String, time: String, isRace: Boolean = false) {
         if (time.isEmpty()) return
         Row(modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp), horizontalAlignment = Alignment.Start, verticalAlignment = Alignment.CenterVertically) {
-            Text(text = label, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary)), modifier = GlanceModifier.weight(1f))
+            Text(text = label, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Bold, color = ColorProvider(day = Color(0xFFFFFFFF), night = Color(0xFFFFFFFF))))
             Spacer(modifier = GlanceModifier.width(8.dp))
-            Box(modifier = GlanceModifier.background(ColorProvider(R.color.widget_header_background)).cornerRadius(12.dp).padding(horizontal = 12.dp, vertical = 6.dp)) {
-                Text(text = formatSessionTime(time, label), style = TextStyle(fontSize = 12.sp, color = ColorProvider(if (isRace) R.color.widget_text_primary else R.color.widget_text_secondary)))
+            Box(modifier = GlanceModifier.background(ColorProvider(day = Color(0xFF38383F), night = Color(0xFF38383F))).cornerRadius(12.dp).padding(horizontal = 12.dp, vertical = 6.dp)) {
+                val textColor = if (isRace) Color(0xFFFFFFFF) else Color(0xFF949498)
+                Text(text = formatSessionTime(time, label), style = TextStyle(fontSize = 12.sp, color = ColorProvider(day = textColor, night = textColor)))
             }
         }
     }
