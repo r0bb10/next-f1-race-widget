@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">F1 Widget</string>
-    <string name="widget_description">Shows next F1 race schedule</string>
     <string name="next_round_widget_description">Next F1 race countdown with full schedule</string>
-    <string name="language">Language</string>
-    <string name="timezone">Timezone</string>
-    <string name="settings">Settings</string>
 </resources>
