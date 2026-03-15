@@ -161,7 +161,6 @@ class NextRoundF1Widget : GlanceAppWidget() {
             Box(modifier = GlanceModifier.fillMaxWidth().height(1.dp).background(ColorProvider(R.color.widget_separator))) {}
             Spacer(modifier = GlanceModifier.height(4.dp))
             SessionRow("QUALIFYING", race.session4)
-            @Suppress("SpellCheckingInspection")
             SessionRow("GRAND PRIX", race.session5, isRace = true)
         }
     }
