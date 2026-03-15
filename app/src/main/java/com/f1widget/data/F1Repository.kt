@@ -1,88 +1,68 @@
+@file:OptIn(kotlinx.serialization.InternalSerializationApi::class, kotlinx.serialization.ExperimentalSerializationApi::class)
 package com.f1widget.data
 
+import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.util.*
 
-class F1Repository {
+data class CalendarItem(
+    val id: String = "",
+    val roundTitle: String = "",
+    val venueName: String = "",
+    val country: String = "",
+    val track: String = "",
+    val session1: String = "",
+    val session2: String = "",
+    val session3: String = "",
+    val session4: String = "",
+    val session5: String = "",
+    val weekendType: String? = null
+)
 
+class F1Repository {
     private val httpClient = HttpClient(Android) {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                isLenient = true
-            })
-        }
+        install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true; isLenient = true }) }
+        install(HttpTimeout) { requestTimeoutMillis = 15000; connectTimeoutMillis = 15000; socketTimeoutMillis = 15000 }
     }
 
     private val baseUrl = "https://api.openf1.org/v1"
 
-    suspend fun getNextRace(): CalendarItem? {
-        return try {
-            val year = Calendar.getInstance().get(Calendar.YEAR)
-            val sessions: List<OpenF1Session> = httpClient
-                .get("$baseUrl/sessions?year=$year")
-                .body()
+    suspend fun getNextRace(): CalendarItem? = try {
+        val now = Date()
+        val year = Calendar.getInstance().get(Calendar.YEAR)
+        val sessions: List<OpenF1Session> = httpClient.get("$baseUrl/sessions?year=$year").body()
 
-            // Find next race weekend
-            val now = Date()
-            val nextRaceSession = sessions
-                .filter { it.sessionType == "Race" && parseDate(it.dateStart).after(now) }
-                .minByOrNull { parseDate(it.dateStart) }
-                ?: return null
+        val allRaces = sessions.filter { it.sessionType == "Race" }.sortedBy { parseDate(it.dateStart) }
+        val nextRace = allRaces.firstOrNull { parseDate(it.dateStart).after(now) } ?: allRaces.lastOrNull() ?: return null
+        
+        val roundId = "round_${allRaces.indexOfFirst { it.meetingKey == nextRace.meetingKey } + 1}"
+        val weekend: List<OpenF1Session> = try { httpClient.get("$baseUrl/sessions?meeting_key=${nextRace.meetingKey}").body() } catch (_: Exception) { listOf(nextRace) }
 
-            // Get all sessions for that meeting
-            val weekendSessions: List<OpenF1Session> = httpClient
-                .get("$baseUrl/sessions?meeting_key=${nextRaceSession.meetingKey}")
-                .body()
-
-            // Sort by date and convert to CalendarItem
-            nextRaceSession.toCalendarItem(weekendSessions)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+        nextRace.toCalendarItem(weekend, roundId)
+    } catch (e: Exception) {
+        Log.e("F1Repo", "Error: ${e.message}"); null
     }
 
-    fun getNextRaceFlow(): Flow<CalendarItem?> = flow {
-        emit(getNextRace())
-    }
+    private fun parseDate(isoDate: String): Date = try {
+        val clean = isoDate.split("+")[0].split("Z")[0]
+        val format = SimpleDateFormat(if (clean.contains(".")) "yyyy-MM-dd'T'HH:mm:ss.SSS" else "yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+        format.apply { timeZone = TimeZone.getTimeZone("UTC") }.parse(clean) ?: Date(0)
+    } catch (_: Exception) { Date(0) }
 
-    private fun parseDate(isoDate: String): Date {
-        return try {
-            val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
-                timeZone = TimeZone.getTimeZone("UTC")
-            }
-            format.parse(isoDate) ?: Date()
-        } catch (e: Exception) {
-            Date()
-        }
-    }
-
-    private fun OpenF1Session.toCalendarItem(allSessions: List<OpenF1Session>): CalendarItem {
-        val sorted = allSessions.sortedBy { it.dateStart }
-
-        // Determine weekend type
-        val isSprint = allSessions.any {
-            it.sessionName.contains("Sprint", ignoreCase = true) &&
-            !it.sessionName.contains("Qualifying", ignoreCase = true)
-        }
-
-        // Extract round number from session key or meeting key
-        val roundNum = "round_${String.format("%02d", meetingKey % 100)}"
-
+    private fun OpenF1Session.toCalendarItem(all: List<OpenF1Session>, roundId: String): CalendarItem {
+        val sorted = all.sortedBy { it.dateStart }
         return CalendarItem(
-            id = roundNum,
+            id = roundId,
             roundTitle = "$countryName Grand Prix",
             venueName = circuitShortName,
             country = countryName,
@@ -92,22 +72,18 @@ class F1Repository {
             session3 = sorted.getOrNull(2)?.dateStart ?: "",
             session4 = sorted.getOrNull(3)?.dateStart ?: "",
             session5 = sorted.getOrNull(4)?.dateStart ?: "",
-            weekendType = if (isSprint) "sprint" else null
+            weekendType = if (all.any { it.sessionName.contains("Sprint", true) && !it.sessionName.contains("Qualifying", true) }) "sprint" else null
         )
     }
 
     @Serializable
     data class OpenF1Session(
-        @SerialName("session_key") val sessionKey: Int,
         @SerialName("session_type") val sessionType: String,
         @SerialName("session_name") val sessionName: String,
         @SerialName("date_start") val dateStart: String,
-        @SerialName("date_end") val dateEnd: String,
         @SerialName("meeting_key") val meetingKey: Int,
         @SerialName("circuit_short_name") val circuitShortName: String,
         @SerialName("country_name") val countryName: String,
-        @SerialName("country_code") val countryCode: String,
-        @SerialName("location") val location: String,
-        @SerialName("year") val year: Int
+        @SerialName("location") val location: String
     )
 }
