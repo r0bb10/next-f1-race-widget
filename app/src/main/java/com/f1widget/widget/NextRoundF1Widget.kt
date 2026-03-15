@@ -103,19 +103,19 @@ class NextRoundF1Widget : GlanceAppWidget() {
     private fun InfoBox(race: com.f1widget.data.CalendarItem) {
         Box(
             modifier = GlanceModifier
-                .padding(0.dp)
+                .defaultWeight()
                 .background(ColorProvider(R.color.widget_header_background))
                 .cornerRadius(8.dp)
                 .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
             Column {
                 Text(
-                    text = "${extractRoundNumber(race.id)}•${race.track.uppercase()} ${getCountryFlag(race.country)}",
+                    text = "${extractRoundNumber(race.id)}•${extractLocation(race)} ${getCountryFlag(race.country)}",
                     style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary))
                 )
                 Spacer(modifier = GlanceModifier.height(2.dp))
                 Text(
-                    text = race.country.uppercase(),
+                    text = race.roundTitle.uppercase(),
                     style = TextStyle(fontSize = 10.sp, color = ColorProvider(R.color.widget_text_secondary)),
                     maxLines = 2
                 )
@@ -199,6 +199,15 @@ class NextRoundF1Widget : GlanceAppWidget() {
     private fun extractRoundNumber(id: String): String {
         val match = Regex("\\d+").find(id)
         return match?.let { "R${it.value.toInt()}" } ?: "R?"
+    }
+
+    private fun extractLocation(race: com.f1widget.data.CalendarItem): String {
+        // Use track name if available, otherwise use country
+        return if (race.track.isNotEmpty() && race.track != race.country) {
+            race.track
+        } else {
+            race.country
+        }
     }
 
     private fun parseIsoDate(isoDate: String): Date {
