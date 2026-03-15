@@ -234,7 +234,7 @@ class NextRoundWidgetSimple : GlanceAppWidget() {
                     .fillMaxWidth()
                     .height(1.dp)
                     .background(ColorProvider(R.color.widget_separator))
-            )
+            ) {}
             Spacer(modifier = GlanceModifier.height(4.dp))
 
             // Session 4 (Qualifying)

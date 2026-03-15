@@ -13,11 +13,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.DayNight">
 
-        <!-- Main Activity (not shown in launcher, only in app list) -->
+        <!-- Main Activity -->
         <activity
             android:name=".MainActivity"
-            android:exported="false"
+            android:exported="true"
             android:theme="@style/Theme.Material3.DayNight">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <!-- Widget Provider - Simple -->
