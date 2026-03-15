@@ -181,7 +181,8 @@ class NextRoundF1Widget : GlanceAppWidget() {
     private fun formatSessionTime(isoDateTime: String): String {
         return try {
             val date = parseIsoDate(isoDateTime)
-            val outputFormat = SimpleDateFormat("EEE HH:mm", Locale.getDefault()).apply { timeZone = TimeZone.getDefault() }
+            // Format: "FRIDAY 18:00" to match Racify design
+            val outputFormat = SimpleDateFormat("EEEE HH:mm", Locale.ENGLISH).apply { timeZone = TimeZone.getDefault() }
             outputFormat.format(date).uppercase()
         } catch (_: Exception) { isoDateTime }
     }
