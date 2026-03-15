@@ -25,7 +25,7 @@ class F1Widget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val repository = F1Repository()
         val nextRace = try {
-            repository.getNextRace().first()
+            repository.getNextRace()
         } catch (e: Exception) {
             null
         }
