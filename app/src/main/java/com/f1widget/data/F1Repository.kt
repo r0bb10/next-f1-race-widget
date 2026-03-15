@@ -45,7 +45,6 @@ class F1Repository {
         val allRaces = sessions.filter { it.sessionType == "Race" }.sortedBy { parseDate(it.dateStart) }
         val nextRace = allRaces.firstOrNull { parseDate(it.dateStart).after(now) } ?: allRaces.lastOrNull() ?: return null
 
-        // Count unique meetings (race weekends) to get correct round number
         val uniqueMeetings = allRaces.takeWhile { it.meetingKey <= nextRace.meetingKey }.distinctBy { it.meetingKey }
         val roundId = "round_${uniqueMeetings.size}"
         val weekend: List<OpenF1Session> = try { httpClient.get("$baseUrl/sessions?meeting_key=${nextRace.meetingKey}").body() } catch (_: Exception) { listOf(nextRace) }

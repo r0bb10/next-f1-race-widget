@@ -1,8 +1,8 @@
 package com.f1widget.widget
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -46,7 +46,6 @@ class NextRoundF1Widget : GlanceAppWidget() {
         }
     }
 
-    @SuppressLint("RestrictedApi")
     @Composable
     private fun WidgetContent(race: com.f1widget.data.CalendarItem?) {
         Box(
@@ -81,7 +80,6 @@ class NextRoundF1Widget : GlanceAppWidget() {
         }
     }
 
-    @SuppressLint("RestrictedApi")
     @Composable
     private fun DateBox(race: com.f1widget.data.CalendarItem) {
         val (dayRange, month) = extractDateRange(race.session1, race.session5)
@@ -89,16 +87,15 @@ class NextRoundF1Widget : GlanceAppWidget() {
             modifier = GlanceModifier
                 .background(ColorProvider(R.color.f1_white))
                 .cornerRadius(8.dp)
-                .padding(horizontal = 8.dp, vertical = 6.dp)
+                .padding(horizontal = 10.dp, vertical = 8.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = dayRange, style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.f1_black)))
-                Text(text = month, style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.f1_black)))
+                Text(text = dayRange, style = TextStyle(fontSize = 22.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.f1_black)))
+                Text(text = month, style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.f1_black)))
             }
         }
     }
 
-    @SuppressLint("RestrictedApi")
     @Composable
     private fun InfoBox(race: com.f1widget.data.CalendarItem) {
         Box(
@@ -106,24 +103,23 @@ class NextRoundF1Widget : GlanceAppWidget() {
                 .defaultWeight()
                 .background(ColorProvider(R.color.widget_header_background))
                 .cornerRadius(8.dp)
-                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .padding(horizontal = 12.dp, vertical = 10.dp)
         ) {
             Column {
                 Text(
                     text = "${extractRoundNumber(race.id)}•${extractLocation(race)} ${getCountryFlag(race.country)}",
-                    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary))
+                    style = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary))
                 )
-                Spacer(modifier = GlanceModifier.height(2.dp))
+                Spacer(modifier = GlanceModifier.height(4.dp))
                 Text(
                     text = race.roundTitle.uppercase(),
-                    style = TextStyle(fontSize = 10.sp, color = ColorProvider(R.color.widget_text_secondary)),
+                    style = TextStyle(fontSize = 11.sp, color = ColorProvider(R.color.widget_text_secondary)),
                     maxLines = 2
                 )
             }
         }
     }
 
-    @SuppressLint("RestrictedApi")
     @Composable
     private fun CountdownBox(race: com.f1widget.data.CalendarItem) {
         val nextSessionTime = findNextSession(race)
@@ -141,16 +137,14 @@ class NextRoundF1Widget : GlanceAppWidget() {
         }
     }
 
-    @SuppressLint("RestrictedApi")
     @Composable
     private fun CountdownUnit(value: String, label: String) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = value, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary)))
-            Text(text = label, style = TextStyle(fontSize = 8.sp, color = ColorProvider(R.color.widget_text_secondary)))
+            Text(text = value, style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary)))
+            Text(text = label, style = TextStyle(fontSize = 9.sp, color = ColorProvider(R.color.widget_text_secondary)))
         }
     }
 
-    @SuppressLint("RestrictedApi")
     @Composable
     private fun SessionsList(race: com.f1widget.data.CalendarItem) {
         Column(modifier = GlanceModifier.fillMaxWidth()) {
@@ -165,25 +159,40 @@ class NextRoundF1Widget : GlanceAppWidget() {
         }
     }
 
-    @SuppressLint("RestrictedApi")
     @Composable
     private fun SessionRow(label: String, time: String, isRace: Boolean = false) {
         if (time.isEmpty()) return
         Row(modifier = GlanceModifier.fillMaxWidth().padding(vertical = 4.dp), horizontalAlignment = Alignment.Start, verticalAlignment = Alignment.CenterVertically) {
-            Text(text = label, style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary)), modifier = GlanceModifier.defaultWeight())
+            Text(text = label, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Bold, color = ColorProvider(R.color.widget_text_primary)), modifier = GlanceModifier.defaultWeight())
             Spacer(modifier = GlanceModifier.width(8.dp))
-            Box(modifier = GlanceModifier.background(ColorProvider(R.color.widget_header_background)).cornerRadius(12.dp).padding(horizontal = 12.dp, vertical = 4.dp)) {
-                Text(text = formatSessionTime(time), style = TextStyle(fontSize = 11.sp, color = ColorProvider(if (isRace) R.color.widget_text_primary else R.color.widget_text_secondary)))
+            Box(modifier = GlanceModifier.background(ColorProvider(R.color.widget_header_background)).cornerRadius(12.dp).padding(horizontal = 12.dp, vertical = 6.dp)) {
+                Text(text = formatSessionTime(time, label), style = TextStyle(fontSize = 12.sp, color = ColorProvider(if (isRace) R.color.widget_text_primary else R.color.widget_text_secondary)))
             }
         }
     }
 
-    private fun formatSessionTime(isoDateTime: String): String {
+    private fun formatSessionTime(isoDateTime: String, sessionLabel: String): String {
         return try {
-            val date = parseIsoDate(isoDateTime)
-            // Format: "FRIDAY 18:00" to match Racify design
-            val outputFormat = SimpleDateFormat("EEEE HH:mm", Locale.ENGLISH).apply { timeZone = TimeZone.getDefault() }
-            outputFormat.format(date).uppercase()
+            val startDate = parseIsoDate(isoDateTime)
+            val calendar = Calendar.getInstance().apply { time = startDate }
+
+            val durationMinutes = when {
+                sessionLabel.contains("PRACTICE") -> 60
+                sessionLabel.contains("SPRINT QUALIFYING") -> 60
+                sessionLabel.contains("SPRINT") && !sessionLabel.contains("QUALIFYING") -> 30
+                sessionLabel.contains("QUALIFYING") -> 60
+                sessionLabel.contains("GRAND PRIX") -> 120
+                else -> 60
+            }
+
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.ENGLISH).apply { timeZone = TimeZone.getDefault() }
+            val dayFormat = SimpleDateFormat("EEEE", Locale.ENGLISH).apply { timeZone = TimeZone.getDefault() }
+            val startTime = timeFormat.format(startDate)
+
+            calendar.add(Calendar.MINUTE, durationMinutes)
+            val endTime = timeFormat.format(calendar.time)
+
+            "${dayFormat.format(startDate).uppercase()} $startTime - $endTime"
         } catch (_: Exception) { isoDateTime }
     }
 
@@ -203,7 +212,6 @@ class NextRoundF1Widget : GlanceAppWidget() {
     }
 
     private fun extractLocation(race: com.f1widget.data.CalendarItem): String {
-        // Use track name if available, otherwise use country
         return if (race.track.isNotEmpty() && race.track != race.country) {
             race.track
         } else {

@@ -32,7 +32,6 @@ fun SettingsScreen() {
         mutableStateOf(prefs.getString("language", Locale.getDefault().language) ?: "en")
     }
 
-    // Auto-detect timezone from phone
     val phoneTimezone = TimeZone.getDefault().id
 
     Scaffold(
